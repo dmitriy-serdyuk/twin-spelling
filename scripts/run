@@ -3,7 +3,8 @@ import argparse
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 
-from twinnet.dataset import SpellCheckData
+from twinnet import Model
+from twinnet.dataset import SpellCheckData, VOCABULARY
 
 
 def train_epoch(train_stream, model, optimizer):
@@ -41,8 +42,7 @@ def main(mode, length, prob, epochs, batch_size, learning_rate):
         train_stream = DataLoader(train_data, batch_size, shuffle=True)
         valid_stream = DataLoader(valid_data, batch_size, shuffle=False)
 
-        # TODO
-        model = None
+        model = Model(len(VOCABULARY), 256)
 
         optimizer = Adam(model.parameters(), lr=learning_rate)
 
