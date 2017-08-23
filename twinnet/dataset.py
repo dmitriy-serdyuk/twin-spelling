@@ -3,10 +3,10 @@ import numpy
 from itertools import chain
 from torch.utils.data import Dataset
 
-punctuation = " -.''1234567890&$#\\/*"
-characters = string.ascii_lowercase + punctuation + "N" + "<" + ">" + "\n"
-vocabulary = {c: ind for ind, c in enumerate(characters)}
-rev_vocabulary = {ind: c for ind, c in enumerate(characters)}
+PUNCTUATION = " -.''1234567890&$#\\/*"
+CHARACTERS = string.ascii_lowercase + PUNCTUATION + "N" + "<" + ">" + "\n"
+VOCABULARY = {c: ind for ind, c in enumerate(CHARACTERS)}
+REV_VOCABULARY = {ind: c for ind, c in enumerate(CHARACTERS)}
 
 
 class Penntree(Dataset):
@@ -14,7 +14,8 @@ class Penntree(Dataset):
         self.subset = subset
         self.length = length
         with open("data/penn/{}.txt".format(subset), "r") as f:
-            self.data = list(chain(*[[vocabulary[c] for c in seq] for seq in f]))
+            self.data = list(chain(*[[VOCABULARY[c] for c in seq]
+                                     for seq in f]))
 
     def __len__(self):
         return len(self.data) // self.length
@@ -37,7 +38,7 @@ class SpellCheckData(Penntree):
         target = super(SpellCheckData, self).__getitem__(i)
         input = target.copy()
         indeces = self.rng.binomial(1, self.prob, size=input.shape)
-        substitute = self.rng.choice(list(rev_vocabulary.keys()), size=input.shape)
-        input =  substitute * indeces + input * (1 - indeces)
+        substitute = self.rng.choice(list(REV_VOCABULARY.keys()), size=input.shape)
+        input = substitute * indeces + input * (1 - indeces)
 
         return input, target
